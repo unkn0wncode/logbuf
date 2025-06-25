@@ -9,13 +9,13 @@ import (
 )
 
 func TestNewValidation(t *testing.T) {
-	_, err := New(0, 0, ":memory:")
+	_, err := NewSQliteBuffer(0, 0, ":memory:")
 	require.Error(t, err, "expected error when both constraints zero")
 }
 
 func TestWriteAndDump(t *testing.T) {
 	fp := filepath.Join(t.TempDir(), "lb.db")
-	lb, err := New(10, 0, fp)
+	lb, err := NewSQliteBuffer(10, 0, fp)
 	require.NoError(t, err)
 	defer lb.Clear()
 
@@ -31,7 +31,7 @@ func TestWriteAndDump(t *testing.T) {
 
 func TestMaxLinesRetention(t *testing.T) {
 	fp := filepath.Join(t.TempDir(), "lb.db")
-	lb, err := New(2, 0, fp)
+	lb, err := NewSQliteBuffer(2, 0, fp)
 	require.NoError(t, err)
 	defer lb.Clear()
 
@@ -46,7 +46,7 @@ func TestMaxLinesRetention(t *testing.T) {
 
 func TestClear(t *testing.T) {
 	fp := filepath.Join(t.TempDir(), "lb.db")
-	lb, err := New(10, 0, fp)
+	lb, err := NewSQliteBuffer(10, 0, fp)
 	require.NoError(t, err)
 	defer lb.Clear()
 

@@ -20,11 +20,11 @@ const (
 )
 
 // Create separate loggers with the same flags but with different writers:
-//  - stdBufLogger writes to both stdout and the buffer using a multi-writer;
-//  - bufOnlyLogger writes only to the buffer.
+//   - stdBufLogger writes to both stdout and the buffer using a multi-writer;
+//   - bufOnlyLogger writes only to the buffer.
 var (
 	bufPath       = filepath.Join(os.TempDir(), "stdlog-logbuf.db")
-	lb, _         = logbuf.New(50, 0, bufPath)
+	lb, _         = logbuf.NewSQliteBuffer(50, 0, bufPath)
 	multiWriter   = io.MultiWriter(os.Stdout, lb)
 	stdBufLogger  = log.New(multiWriter, "", log.LstdFlags)
 	bufOnlyLogger = log.New(lb, "", log.LstdFlags)

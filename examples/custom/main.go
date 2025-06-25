@@ -10,7 +10,7 @@ import (
 	"github.com/unkn0wncode/logbuf"
 )
 
-var lb logbuf.LogBuf
+var lb logbuf.Buffer
 
 func Debug(format string, a ...any) {
 	msg := fmt.Sprintf("DEBUG: "+format, a...)
@@ -26,7 +26,7 @@ func Info(format string, a ...any) {
 func main() {
 	fp := filepath.Join(os.TempDir(), "custom-logbuf.db")
 	var err error
-	lb, err = logbuf.New(100, 0, fp)
+	lb, err = logbuf.NewSQliteBuffer(100, 0, fp)
 	if err != nil {
 		log.Fatalf("logbuf: %v", err)
 	}

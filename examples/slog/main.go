@@ -15,7 +15,7 @@ import (
 
 // bufHandler writes every record to LogBuf and forwards INFO+ to stdout.
 type bufHandler struct {
-	buf logbuf.LogBuf
+	buf logbuf.Buffer
 }
 
 func (h bufHandler) Enabled(_ context.Context, level slog.Level) bool { return true }
@@ -34,7 +34,7 @@ func (h bufHandler) WithGroup(name string) slog.Handler       { return h }
 
 func main() {
 	fp := filepath.Join(os.TempDir(), "slog-logbuf.db")
-	lbIface, err := logbuf.New(500, 48*time.Hour, fp)
+	lbIface, err := logbuf.NewSQliteBuffer(500, 48*time.Hour, fp)
 	if err != nil {
 		log.Fatalf("logbuf: %v", err)
 	}

@@ -1,4 +1,4 @@
-# LogBuf – SQLite-backed transient log buffer for Go
+# logbuf – SQLite-backed transient log buffer for Go
 
 `logbuf` is a small Go library that provides an in-process buffer for raw log
 lines.  The buffer is persisted in a light-weight SQLite database (optionally
@@ -58,13 +58,13 @@ records are kept in the buffer and can be dumped on demand.
 ## API overview
 
 ```go
-func New(maxLines int, maxAge time.Duration, dbPath string) (logbuf.LogBuf, error)
+func NewSQliteBuffer(maxLines int, maxAge time.Duration, dbPath string) (logbuf.Buffer, error)
 ```
 
 * If **both** `maxLines` and `maxAge` are 0, `New` returns an error.
 * Pass `":memory:"` for `dbPath` if you want the database to live only in RAM.
 
-The returned `LogBuf` interface provides:
+The returned `logbuf.Buffer` interface provides:
 
 * `Write(entry []byte) (int, error)` – append a single entry (binary-safe).
 * `WriteString(entry string) error` – convenience wrapper accepting UTF-8 strings.
