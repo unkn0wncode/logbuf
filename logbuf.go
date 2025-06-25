@@ -25,36 +25,16 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type LogBuf interface {
-	io.Writer // Write(p []byte) (int, error)
-
-	// WriteString is a convenience wrapper around Write for UTF-8 strings.
-	WriteString(entry string) error
-
-	// Dump returns all currently buffered log entries ordered by their time of
-	// insertion – oldest first.
-	Dump() ([]string, error)
-
-	// Close closes the underlying database connection.
-	Close()
-
-	// Clear deletes the on-disk database. The buffer becomes empty and the
-	// next call to Write or Dump recreates a fresh database automatically.
-	Clear() error
-}
-
-// sqliteBuf implements LogBuf.
-type sqliteBuf struct {
-	db       *sql.DB
-	dbPath   string
-	maxLines int
-	maxAge   time.Duration
-	mu       sync.RWMutex
-}
-
 const (
 	writeStmt = `INSERT INTO log(entry) VALUES (?);`
 	dumpStmt  = `SELECT entry FROM log ORDER BY timestamp;`
+)
+
+// Interface checks.
+var (
+	_ io.Writer = (LogBuf)(nil)
+	_ io.Writer = (*sqliteBuf)(nil)
+	_ LogBuf    = (*sqliteBuf)(nil)
 )
 
 var setupSQL = []string{
@@ -88,6 +68,34 @@ var setupSQL = []string{
                SELECT rowid FROM log ORDER BY timestamp DESC LIMIT (SELECT maxLines FROM log_settings WHERE id = 1)
            );
      END;`,
+}
+
+// LogBuf interface describes temporary storage for unfiltered log entries.
+type LogBuf interface {
+	io.Writer // Write(p []byte) (int, error)
+
+	// WriteString is a convenience wrapper around Write for UTF-8 strings.
+	WriteString(entry string) error
+
+	// Dump returns all currently buffered log entries ordered by their time of
+	// insertion – oldest first.
+	Dump() ([]string, error)
+
+	// Close closes the underlying database connection.
+	Close()
+
+	// Clear deletes the on-disk database. The buffer becomes empty and the
+	// next call to Write or Dump recreates a fresh database automatically.
+	Clear() error
+}
+
+// sqliteBuf implements LogBuf.
+type sqliteBuf struct {
+	db       *sql.DB
+	dbPath   string
+	maxLines int
+	maxAge   time.Duration
+	mu       sync.RWMutex
 }
 
 // New returns an SQLite-backed LogBuf. At least one of maxLines or maxAge must
